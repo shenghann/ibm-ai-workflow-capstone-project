@@ -13,10 +13,10 @@ def root():
     return {"message": "Welcome"}
 
 @app.post("/train")
-def train(mode):
+def train(mode=None):
     start_time = time.time()
     model.process_and_train(test=(mode == 'test'))
-    return {"message": f"Training completed in {time.time() - start_time:.2}"}
+    return {"message": f"Training completed in {(time.time() - start_time):.2}"}
 
 @app.post('/predict')
 async def predict(data : Request):

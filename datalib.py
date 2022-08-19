@@ -12,8 +12,8 @@ from pathlib import Path
 # read from json
 # output country-level CSVs
 
-RAW_DATA_ROOT = Path('cs-train')
 DATA_ROOT = Path('data')
+RAW_DATA_ROOT = DATA_ROOT / 'cs-train'
 
 def ingest_data(dir):
     """
@@ -51,6 +51,37 @@ def ingest_data(dir):
 
     return df
 
+def process_timeseries(df, country=None):
+    """
+    Process dataframe and convert into timeseries
+    """
+    if country:
+        df = df[df.country == country]
+
+    # create day range from first ot last day in dataset
+    day_range = pd.date_range(df.date.min(), df.date.max())
+
+    # create summarized timeseries dataset for each day
+    purchases, invoices, streams, views, revenue = [], [], [], [], []
+    for day in day_range:
+        rec = df[df.date == day]
+        purchases.append(len(rec))
+        invoices.append(rec.invoice.nunique())
+        streams.append(rec.stream_id.nunique())
+        views.append(rec.times_viewed.sum())
+        revenue.append(rec.price.sum())
+        
+    df_daily = pd.DataFrame({'date':day_range,
+                            'purchases':purchases,
+                            'invoices':invoices,
+                            'streams':streams,
+                            'views':views,
+                            'revenue':revenue})
+    df_daily.set_index('date',inplace=True)
+    df_daily['year_month'] = df_daily.index.to_period('M')
+
+    return df_daily
+
 def get_country_data(data_dir, country=None):
     """
     Convert dataset to timeseries and split by country
@@ -70,39 +101,18 @@ def get_country_data(data_dir, country=None):
 
     df = ingest_data(RAW_DATA_ROOT)
 
-    # create day range from first ot last day in dataset
-    day_range = pd.date_range(df.date.min(), df.date.max())
-
     # filter top 10 countries by revenue
     top_countries = df.groupby('country').price.sum().sort_values(ascending=False)[:10].index
     dft = df[df.country.isin(top_countries)]
 
-    # create summarized timeseries dataset for each day
+    # convert to timeseries
     countries = {}
-    for country in dft.country.unique():
-        dftc = dft[dft.country == country]
-        purchases, invoices, streams, views, revenue = [], [], [], [], []
-        for day in day_range:
-            rec = dftc[dftc.date == day]
-            purchases.append(len(rec))
-            invoices.append(rec.invoice.nunique())
-            streams.append(rec.stream_id.nunique())
-            views.append(rec.times_viewed.sum())
-            revenue.append(rec.price.sum())
-            
-        df_daily = pd.DataFrame({'date':day_range,
-                                'purchases':purchases,
-                                'invoices':invoices,
-                                'streams':streams,
-                                'views':views,
-                                'revenue':revenue})
-        df_daily.set_index('date',inplace=True)
-        df_daily['year_month'] = df_daily.index.to_period('M')
-
-        countries[country] = df_daily
-
+    countries['all'] = process_timeseries(dft)
+    for country_name in top_countries:
+        df_daily = process_timeseries(dft, country=country_name)
+        countries[country_name] = df_daily
         # save to CSV
-        df_daily.to_csv(data_dir / f'{country}.csv')
+        df_daily.to_csv(data_dir / f'{country_name}.csv')
     
     if country:
         return countries[country]
@@ -138,5 +148,3 @@ if __name__ == "__main__":
 
     # country level timeseries dataset
     countries = get_country_data(DATA_ROOT)
-
-    # do something data

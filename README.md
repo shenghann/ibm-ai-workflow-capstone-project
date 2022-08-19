@@ -21,7 +21,7 @@ docker image ls
 ```
 Run the container
 ```
-docker run -p 8080:8000 predict-revenue-app
+docker run -p 8000:8000 predict-revenue-app
 ```
 ### Local Run
 Setup local python environment by running provided setup script, which installs a virtual environment in `env` folder and all required packages
