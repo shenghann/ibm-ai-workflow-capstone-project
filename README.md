@@ -47,3 +47,7 @@ To test the app
 ```
 python run_tests.py
 ```
+
+## Performance Monitoring
+
+My findings on the production data and how the trained model fared is detailed in last section of `Report Notebook.ipynb`
