@@ -107,7 +107,9 @@ def get_country_data(data_dir, country=None):
 
     # convert to timeseries
     countries = {}
-    countries['all'] = process_timeseries(dft)
+    df_daily_all = process_timeseries(dft)
+    countries['all'] = df_daily_all
+    df_daily_all.to_csv(data_dir / 'all.csv')
     for country_name in top_countries:
         df_daily = process_timeseries(dft, country=country_name)
         countries[country_name] = df_daily

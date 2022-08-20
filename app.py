@@ -23,6 +23,19 @@ Send a POST request with your input data as a JSON payload in the following form
 }        
 ```
 
+Supported countries (top 10 revenue):
+- `all` for all countries combined
+- EIRE
+- France
+- Germany
+- Hong Kong
+- Netherlands
+- Norway
+- Portugal
+- Singapore
+- Spain
+- United Kingdom
+
 Returns a value for predicted revenue for the country and day.
 
 ## Logging Endpoint
