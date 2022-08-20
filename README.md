@@ -36,7 +36,7 @@ Start API app
 ```
 python app.py
 ```
-Open http://localhost:8000/docs in your browser to the see API documentations to start. Endpoints are provided for:
+**Recommended**: Open http://localhost:8000/docs in your browser to the see API documentations to start. Endpoints are provided for:
 - Training
 - Prediction
 - Viewing logs

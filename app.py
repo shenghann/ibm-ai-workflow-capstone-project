@@ -4,8 +4,39 @@ from json import JSONDecodeError
 from fastapi import FastAPI, HTTPException, Request
 import datalib, model, logger
 
+description = """
+How to use:
+
+## Train Endpoint
+
+Send a POST request to this endpoints to trigger training/re-training of the model. The `mode` parameter is optional and used only for unittests.
+
+## Predict Endpoint
+
+Send a POST request with your input data as a JSON payload in the following format:
+```
+{
+            "country": "United Kingdom",
+            "year": 2018,
+            "month": 1,
+            "day": 5
+}        
+```
+
+Returns a value for predicted revenue for the country and day.
+
+## Logging Endpoint
+
+View last 5 entries of logs from training and prediction pipelines. 
+
+The `type` parameters accepts:
+- `pred` for prediction logs
+- `train` for training logs
+
+"""
+
 # init fastAPI
-app = FastAPI(title='Revenue Prediction App')
+app = FastAPI(title='Revenue Prediction App', description=description)
 
 # Define the default route 
 @app.get("/")
